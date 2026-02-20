@@ -1,4 +1,4 @@
-import { PublicStackParamsList } from "@/routes"
+import { PublicStackParamsList } from "@/routes/PublicRoutes"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "node_modules/@react-navigation/stack/lib/typescript/src/types"
 import { Text, TouchableOpacity, View } from "react-native"
