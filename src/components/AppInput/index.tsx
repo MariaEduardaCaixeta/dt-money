@@ -27,7 +27,7 @@ export function AppInput<T extends FieldValues>({ control, name, leftIconName, l
         <Controller 
             control={control}
             name={name}
-            render={({ field: { onChange, value } }) => (
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <View className="w-full mt-4">
                     {label && (<Text className={clsx("mb-2 mt-3 text-base", isFocused ? "text-accent-brand" : "text-gray-600")}>{label}</Text>)}
 
