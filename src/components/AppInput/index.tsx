@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { useRef, useState } from "react";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 import { TextInput, TextInputProps, View, Text, TouchableOpacity } from "react-native";
+import { ErrorMessage } from "../ErrorMessage";
 
 interface AppInputParams<T extends FieldValues> extends TextInputProps {
     control: Control<T>
@@ -66,6 +67,10 @@ export function AppInput<T extends FieldValues>({ control, name, leftIconName, l
                             )
                         }
                     </TouchableOpacity>
+
+                    {error && (
+                        <ErrorMessage>{error.message}</ErrorMessage>
+                    )}
                 </View>
             )}
         />
