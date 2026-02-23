@@ -19,13 +19,16 @@ export function LoginForm() {
             <AppInput
                 control={control}
                 name="email"
-                label="Email"
+                label="EMAIL"
+                leftIconName="mail-outline"
                 placeholder="Digite seu email"
             />
             <AppInput
                 control={control}
                 name="password"
-                label="Password"
+                label="SENHA"
+                placeholder="Sua senha"
+                leftIconName="lock-outline"
                 secureTextEntry
             />
         </>
