@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { schema } from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuthContext } from "@/context/auth.context";
+import { AxiosError } from "axios";
 
 export interface LoginFormParams {
   email: string;
@@ -19,17 +21,25 @@ export function LoginForm() {
     formState: { isSubmitting },
   } = useForm<LoginFormParams>({
     defaultValues: {
-        email: "",
-        password: "",
+      email: "",
+      password: "",
     },
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
+
+  const { handleAuthenticate } = useAuthContext();
 
   const navigation = useNavigation<NavigationProp<PublicStackParamsList>>();
 
-  const onSubmit = async  () => {
-
-  }
+  const onSubmit = async (data: LoginFormParams) => {
+    try {
+      await handleAuthenticate(data);
+    } catch (error) {
+      if(error instanceof AxiosError) {
+        console.error("Login error:", error.response?.data || error.message);
+      }
+    }
+  };
 
   return (
     <>
@@ -58,7 +68,11 @@ export function LoginForm() {
           <Text className="mb-6 text-gray-300 text-base">
             Ainda não possui uma conta?
           </Text>
-          <AppButton onPress={() => navigation.navigate("Register")} mode="outline" iconName="arrow-forward">
+          <AppButton
+            onPress={() => navigation.navigate("Register")}
+            mode="outline"
+            iconName="arrow-forward"
+          >
             <Text>Cadastrar</Text>
           </AppButton>
         </View>

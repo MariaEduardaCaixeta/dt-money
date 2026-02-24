@@ -20,6 +20,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
     const handleAuthenticate = async (userData: LoginFormParams) => {
         const { user, token } = await authService.authenticate(userData);
+        console.log("Authenticated user:", user);
+        console.log("Received token:", token);
         setUser(user);
         setToken(token);
     };
