@@ -11,7 +11,7 @@ type AuthContextType = {
   handleAuthenticate: (params: LoginFormParams) => Promise<void>;
   handleRegister: (params: FormRegisterParams) => Promise<void>;
   handleLogout: () => void;
-  restoreUserSession: () => Promise<void>;
+  restoreUserSession: () => Promise<string | null>;
 };
 
 const USER_STORAGE_KEY = "@dtmoney:user";
@@ -48,7 +48,8 @@ export function AuthContextProvider({
     setToken(token);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await AsyncStorage.clear();
     setUser(null);
     setToken(null);
   };
@@ -60,6 +61,8 @@ export function AuthContextProvider({
       setUser(user);
       setToken(token);
     }
+
+    return storedUser
   };
 
   return (
