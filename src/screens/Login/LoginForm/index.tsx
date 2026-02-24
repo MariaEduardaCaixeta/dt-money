@@ -3,11 +3,15 @@ import { AppInput } from "@/components/AppInput";
 import { PublicStackParamsList } from "@/routes/PublicRoutes";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { schema } from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuthContext } from "@/context/auth.context";
 import { AxiosError } from "axios";
+import { useSnackbarContext } from "@/context/snackbar.context";
+import { AppError } from "@/shared/helpers/AppError";
+import { useErrorHandler } from "@/shared/hooks/useErrorHandler";
+import { colors } from "@/shared/colors";
 
 export interface LoginFormParams {
   email: string;
@@ -28,6 +32,7 @@ export function LoginForm() {
   });
 
   const { handleAuthenticate } = useAuthContext();
+  const { handleError } = useErrorHandler();
 
   const navigation = useNavigation<NavigationProp<PublicStackParamsList>>();
 
@@ -35,9 +40,7 @@ export function LoginForm() {
     try {
       await handleAuthenticate(data);
     } catch (error) {
-      if(error instanceof AxiosError) {
-        console.error("Login error:", error.response?.data || error.message);
-      }
+      handleError(error, "Falha ao realizar login");
     }
   };
 
@@ -61,7 +64,11 @@ export function LoginForm() {
 
       <View className="flex-1 justify-between mt-8 mb-6 min-h-[250px]">
         <AppButton onPress={handleSubmit(onSubmit)} iconName="arrow-forward">
-          <Text>Login</Text>
+          {isSubmitting ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <Text>Entrar</Text>
+          )}
         </AppButton>
 
         <View>
