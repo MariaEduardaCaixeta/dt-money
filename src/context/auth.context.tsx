@@ -3,57 +3,83 @@ import { FormRegisterParams } from "@/screens/Register/RegisterForm";
 import { createContext, useContext, useState } from "react";
 import * as authService from "@/shared/services/dt-money/auth.service";
 import { IUser } from "@/shared/interfaces/user-interface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type AuthContextType = {
-    user: IUser | null;
-    token: string | null;
-    handleAuthenticate: (params: LoginFormParams) => Promise<void>;
-    handleRegister: (params: FormRegisterParams) => Promise<void>;
-    handleLogout: () => void;
+  user: IUser | null;
+  token: string | null;
+  handleAuthenticate: (params: LoginFormParams) => Promise<void>;
+  handleRegister: (params: FormRegisterParams) => Promise<void>;
+  handleLogout: () => void;
+  restoreUserSession: () => Promise<void>;
 };
 
-export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const USER_STORAGE_KEY = "@dtmoney:user";
 
-export function AuthContextProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<IUser | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+export const AuthContext = createContext<AuthContextType>(
+  {} as AuthContextType,
+);
 
-    const handleAuthenticate = async (userData: LoginFormParams) => {
-        const { user, token } = await authService.authenticate(userData);
-        console.log("Authenticated user:", user);
-        console.log("Received token:", token);
-        setUser(user);
-        setToken(token);
-    };
+export function AuthContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [user, setUser] = useState<IUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
-    const handleRegister = async (formData: FormRegisterParams) => {
-        const { user, token } = await authService.registerUser(formData);
-        console.log("Registered user:", user);
-        console.log("Received token:", token);
-        setUser(user);
-        setToken(token);
-    };
+  const handleAuthenticate = async (userData: LoginFormParams) => {
+    const { user, token } = await authService.authenticate(userData);
+    await AsyncStorage.setItem(
+      USER_STORAGE_KEY,
+      JSON.stringify({ user, token }),
+    );
+    setUser(user);
+    setToken(token);
+  };
 
-    const handleLogout = () => {
-        setUser(null);
-        setToken(null);
-    };
+  const handleRegister = async (formData: FormRegisterParams) => {
+    const { user, token } = await authService.registerUser(formData);
+    await AsyncStorage.setItem(
+      USER_STORAGE_KEY,
+      JSON.stringify({ user, token }),
+    );
+    setUser(user);
+    setToken(token);
+  };
 
-    return (
-        <AuthContext.Provider value={{
-            user,
-            token,
-            handleAuthenticate,
-            handleRegister,
-            handleLogout
-        }}>
-            {children}
-        </AuthContext.Provider>
-    )
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+  };
+
+  const restoreUserSession = async () => {
+    const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
+    if (storedUser) {
+      const { user, token } = JSON.parse(storedUser);
+      setUser(user);
+      setToken(token);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        handleAuthenticate,
+        handleRegister,
+        handleLogout,
+        restoreUserSession,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export const useAuthContext = () => {
-    const context = useContext(AuthContext);
+  const context = useContext(AuthContext);
 
-    return context;
-}
+  return context;
+};
