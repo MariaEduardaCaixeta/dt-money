@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TouchableOpacity, View, Text, TextInput } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { TransactionTypeSelector } from "../SelectType";
+import { SelectCategoryModal } from "../SelectCategoryModal/index.tsx";
 
 export function NewTransaction() {
   const { closeBottomSheet } = useBottomSheetContext();
@@ -46,18 +47,23 @@ export function NewTransaction() {
           onChangeText={(text) => setTransactionData("description", text)}
         />
 
-        <CurrencyInput 
-            className="text-white text-lg h-[50px] bg-background-primary my-2 rounded-[6] pl-4"
-            value={transaction.value}
-            onChangeValue={(value) => setTransactionData("value", value ?? 0)}
-            prefix="R$ "
-            delimiter="."
-            separator=","
-            minValue={0}
-            precision={2}
+        <CurrencyInput
+          className="text-white text-lg h-[50px] bg-background-primary my-2 rounded-[6] pl-4"
+          value={transaction.value}
+          onChangeValue={(value) => setTransactionData("value", value ?? 0)}
+          prefix="R$ "
+          delimiter="."
+          separator=","
+          minValue={0}
+          precision={2}
         />
 
-        <TransactionTypeSelector 
+        <SelectCategoryModal 
+          selectedCategory={transaction.categoryId}
+          onSelectCategory={(categoryId) => setTransactionData("categoryId", categoryId)}
+        />
+
+        <TransactionTypeSelector
           setTransactionType={(typeId) => setTransactionData("typeId", typeId)}
           typeId={transaction.typeId}
         />
