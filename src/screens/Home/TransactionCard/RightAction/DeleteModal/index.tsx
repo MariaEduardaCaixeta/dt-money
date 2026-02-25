@@ -1,13 +1,21 @@
 import { colors } from "@/shared/colors";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Modal, TouchableWithoutFeedback, View, Text, TouchableOpacity } from "react-native";
+import {
+  Modal,
+  TouchableWithoutFeedback,
+  View,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
 interface Params {
   visible: boolean;
+  loading: boolean;
   hideModal: () => void;
+  handleDeleteTransaction: () => void;
 }
 
-export function DeleteModal({ visible, hideModal }: Params) {
+export function DeleteModal({ visible, loading, hideModal, handleDeleteTransaction }: Params) {
   return (
     <View className="flex-1 absolute">
       <Modal
@@ -21,7 +29,6 @@ export function DeleteModal({ visible, hideModal }: Params) {
             <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
               <View className="m-5 bg-background-secondary rounded-[16] p-8 items-center shadow-lg w-[90%] h-[322] z-9">
                 <View className="w-full flex-row justify-between items-center border-b border-gray-300 pb-6">
-                  
                   <View className="flex-row gap-6 items-center">
                     <MaterialIcons
                       name="error-outline"
@@ -34,10 +41,30 @@ export function DeleteModal({ visible, hideModal }: Params) {
                     </Text>
                   </View>
 
-                  <TouchableOpacity>
-                    <MaterialIcons name="close" color={colors.gray[800]} size={25}/>
+                  <TouchableOpacity onPress={hideModal}>
+                    <MaterialIcons
+                      name="close"
+                      color={colors.gray[800]}
+                      size={25}
+                    />
                   </TouchableOpacity>
-                  
+                </View>
+
+                <View className="p-3 flex-1 border-b border-gray-300 items-center justify-center">
+                  <Text className="text-gray-500 text-lg leading-8">
+                    Tem certeza que deseja apagar esta transação? Esta ação não
+                    pode ser desfeita.
+                  </Text>
+                </View>
+
+                <View className="flex-row justify-end gap-4 w-full p-6 pb-0 pr-0">
+                  <TouchableOpacity className="w-[100] bg-none border-2 border-accent-brand items-center justify-center p-3 rounded-[6]" onPress={hideModal}>
+                    <Text className="text-accent-brand">Cancelar</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity className="w-[100] bg-accent-red-background-primary items-center justify-center p-3 rounded-[6]" onPress={handleDeleteTransaction} disabled={loading}>
+                    <Text className="text-white">{loading ? "Apagando..." : "Apagar"}</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </TouchableWithoutFeedback>

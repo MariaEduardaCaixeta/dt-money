@@ -24,7 +24,7 @@ export function TransactionCard({ transaction }: Params) {
         width: "90%",
         marginBottom: 16,
       }}
-      renderRightActions={() => <RightAction/>}
+      renderRightActions={() => <RightAction transactionId={transaction.id} />}
       overshootRight={false}
     >
       <View className="h-[140] bg-background-tertiary rounded-[6] p-6">
