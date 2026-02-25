@@ -25,7 +25,10 @@ export function RightAction({ transactionId }: Params) {
     try {
       setLoading(true);
       await transactionService.deleteTransaction(transactionId);
-      notify({message: "Transação apagada com sucesso!", messageType: "SUCCESS"});
+      notify({
+        message: "Transação apagada com sucesso!",
+        messageType: "SUCCESS",
+      });
       hideModal();
     } catch (error) {
       handleError(
