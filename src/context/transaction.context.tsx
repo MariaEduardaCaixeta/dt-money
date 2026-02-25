@@ -10,6 +10,7 @@ import {
 import * as transactionService from "@/shared/services/dt-money/transaction.service";
 import { ICreateTransactionRequest } from "@/shared/interfaces/create-transaction-request";
 import { ITransaction } from "@/shared/interfaces/transaction";
+import { ITotalTransactions } from "@/shared/interfaces/total-transactions";
 
 export type TransactionContextType = {
   fetchCategories: () => Promise<void>;
@@ -18,6 +19,7 @@ export type TransactionContextType = {
     transactionData: ICreateTransactionRequest,
   ) => Promise<void>;
   fetchTransactions: () => Promise<void>;
+  totalTransactions: ITotalTransactions;
 };
 
 export const TransactionContext = createContext({} as TransactionContextType);
@@ -30,6 +32,11 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
   >([]);
 
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [totalTransactions, setTotalTransactions] = useState<ITotalTransactions>({
+    expense: 0,
+    revenue: 0,
+    total: 0,
+  });
 
   const fetchCategories = async () => {
     const categories = await transactionService.getTransactionCategories();
@@ -47,8 +54,8 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
       page: 1,
       perPage: 10,
     });
-    console.log(transactions);
     setTransactions(transactions.data);
+    setTotalTransactions(transactions.totalTransactions);
   }, []);
 
   return (
@@ -58,6 +65,7 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
         categories,
         createTransaction,
         fetchTransactions,
+        totalTransactions,
       }}
     >
       {children}
