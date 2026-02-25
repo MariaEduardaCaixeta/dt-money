@@ -18,9 +18,10 @@ export function ListHeader() {
           showsHorizontalScrollIndicator={false}
           className="absolute pl-6 h-[141]"
         >
-          <TransactionCard type="total" amount={totalTransactions.total} />
-          <TransactionCard type={TransactionTypes.REVENUE} amount={totalTransactions.revenue} />
           <TransactionCard type={TransactionTypes.EXPENSE} amount={totalTransactions.expense} />
+          <TransactionCard type={TransactionTypes.REVENUE} amount={totalTransactions.revenue} />
+          <TransactionCard type="total" amount={totalTransactions.total} />
+          
         </ScrollView>
       </View>
     </>
