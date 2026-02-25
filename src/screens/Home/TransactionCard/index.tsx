@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { format } from "date-fns";
 import { Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import { RightAction } from "./RightAction";
 
 interface Params {
   transaction: ITransaction;
@@ -23,6 +24,8 @@ export function TransactionCard({ transaction }: Params) {
         width: "90%",
         marginBottom: 16,
       }}
+      renderRightActions={() => <RightAction/>}
+      overshootRight={false}
     >
       <View className="h-[140] bg-background-tertiary rounded-[6] p-6">
         <Text className="text-base text-white">{transaction.description}</Text>
