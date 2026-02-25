@@ -1,5 +1,9 @@
-import { createContext, useCallback, useState } from "react";
-import { content } from "tailwind.config";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
+import BottomSheet, {
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import { View, TouchableWithoutFeedback } from "react-native";
+import { colors } from "@/shared/colors";
 
 interface BottomSheetContextType {
   openBottomSheet: (content: React.ReactNode, index: number) => void;
@@ -10,30 +14,76 @@ export const BottomSheetContext = createContext<BottomSheetContextType>(
   {} as BottomSheetContextType,
 );
 
-export function BottomSheetProvider({ children }: { children: React.ReactNode }) {
-    const [content, setContent] = useState<React.ReactNode>(null);
+export function BottomSheetProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [content, setContent] = useState<React.ReactNode>(null);
+  const [index, setIndex] = useState(-1);
+  const [isOpen, setIsOpen] = useState(false);
 
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = ["70%", "90%"];
 
-    const openBottomSheet = useCallback(
-        (newContent: React.ReactNode, index: number) => {
-            setContent(newContent);
-        },
-        []
-    );
+  const openBottomSheet = useCallback(
+    (newContent: React.ReactNode, index: number) => {
+      setIndex(index);
+      setIsOpen(true);
+      requestAnimationFrame(() => {
+        bottomSheetRef.current?.snapToIndex(index);
+      });
+      setContent(newContent);
+    },
+    [],
+  );
 
-    const closeBottomSheet = useCallback(() => {
-        setContent(null);
-    }, []);
+  const closeBottomSheet = useCallback(() => {
+    setIsOpen(false);
+    setIndex(-1);
+    bottomSheetRef.current?.close();
+    setContent(null);
+  }, []);
 
-    return (
-        <BottomSheetContext.Provider
-            value={{
-                openBottomSheet,
-                closeBottomSheet
-            }}
-        >
-            {children}
-        </BottomSheetContext.Provider>
-    )
+  const handleSheetChanges = useCallback((index: number) => {
+    if (index === -1) {
+      setIsOpen(false);
+    }
+  }, []);
+
+  return (
+    <BottomSheetContext.Provider
+      value={{
+        openBottomSheet,
+        closeBottomSheet,
+      }}
+    >
+      {children}
+      {isOpen && (
+        <TouchableWithoutFeedback onPress={closeBottomSheet}>
+          <View className="absolute inset-0 bg-black/70 z-1" />
+        </TouchableWithoutFeedback>
+      )}
+      <BottomSheet
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        style={{ zIndex: 2 }}
+        index={index}
+        enablePanDownToClose
+        onChange={handleSheetChanges}
+        backgroundStyle={{ 
+            backgroundColor: colors["background-secondary"],
+            borderTopLeftRadius: 32,
+            borderTopRightRadius: 32,
+            elevation: 9
+         }}
+      >
+        <BottomSheetScrollView>{content}</BottomSheetScrollView>
+      </BottomSheet>
+    </BottomSheetContext.Provider>
+  );
 }
 
+export const useBottomSheetContext = () => {
+  return useContext(BottomSheetContext);
+};
