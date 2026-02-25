@@ -3,35 +3,39 @@ import { useAuthContext } from "@/context/auth.context";
 import { useTransactionContext } from "@/context/transaction.context";
 import { useErrorHandler } from "@/shared/hooks/useErrorHandler";
 import { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ListHeader } from "./ListHeader";
 
 export function Home() {
-    const { handleLogout } = useAuthContext();
-    const { fetchCategories } = useTransactionContext();
-    const { handleError } = useErrorHandler();
+  const { handleLogout } = useAuthContext();
+  const { fetchCategories } = useTransactionContext();
+  const { handleError } = useErrorHandler();
 
-    const handleFetchCategories = async () => {
-        try {
-            await fetchCategories();
-        } catch (error) {
-            handleError(error, "Não foi possível carregar as categorias de transação. Por favor, tente novamente mais tarde.");
-        }
-    };
+  const handleFetchCategories = async () => {
+    try {
+      await fetchCategories();
+    } catch (error) {
+      handleError(
+        error,
+        "Não foi possível carregar as categorias de transação. Por favor, tente novamente mais tarde.",
+      );
+    }
+  };
 
-    useEffect(() => {
-        (async () => {
-            await handleFetchCategories();
-        })();
-    }, []);
+  useEffect(() => {
+    (async () => {
+      await handleFetchCategories();
+    })();
+  }, []);
 
-    return (
-        <SafeAreaView className="flex-1 bg-background-primary">
-            <AppHeader />
-            <Text>Home</Text>
-            <TouchableOpacity onPress={handleLogout}>
-                <Text>Sair</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
-    )
+  return (
+    <SafeAreaView className="flex-1 bg-background-secondary">
+      <FlatList
+        ListHeaderComponent={<ListHeader />}
+        data={[]}
+        renderItem={() => <></>}
+      />
+    </SafeAreaView>
+  );
 }
