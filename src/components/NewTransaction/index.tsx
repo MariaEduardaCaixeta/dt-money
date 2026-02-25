@@ -5,6 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { TouchableOpacity, View, Text, TextInput } from "react-native";
 import CurrencyInput from "react-native-currency-input";
+import { TransactionTypeSelector } from "../SelectType";
 
 export function NewTransaction() {
   const { closeBottomSheet } = useBottomSheetContext();
@@ -54,6 +55,11 @@ export function NewTransaction() {
             separator=","
             minValue={0}
             precision={2}
+        />
+
+        <TransactionTypeSelector 
+          setTransactionType={(typeId) => setTransactionData("typeId", typeId)}
+          typeId={transaction.typeId}
         />
       </View>
     </View>
