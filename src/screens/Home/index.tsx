@@ -12,52 +12,65 @@ export function Home() {
     fetchTransactions,
     transactions,
     refreshTransactions,
-    loading,
     loadMoreTransactions,
+    handleLoadings,
+    loadings
   } = useTransactionContext();
   const { handleError } = useErrorHandler();
 
   const handleFetchCategories = async () => {
     try {
+      handleLoadings({ key: "initial", value: true });
       await fetchCategories();
     } catch (error) {
       handleError(
         error,
         "Não foi possível carregar as categorias de transação. Por favor, tente novamente mais tarde.",
       );
+    } finally {
+      handleLoadings({ key: "initial", value: false });
     }
   };
 
   const handleFetchInitialTransactions = async () => {
     try {
+      handleLoadings({ key: "initial", value: true });
       await fetchTransactions({ page: 1 });
     } catch (error) {
       handleError(
         error,
         "Não foi possível carregar as transações. Por favor, tente novamente mais tarde.",
       );
+    } finally {
+      handleLoadings({ key: "initial", value: false });
     }
   };
 
   const handleLoadMoreTransactions = async () => {
     try {
+      handleLoadings({ key: "loadMore", value: true });
       await loadMoreTransactions();
     } catch (error) {
       handleError(
         error,
         "Não foi possível carregar mais transações. Por favor, tente novamente mais tarde.",
       );
+    } finally {
+      handleLoadings({ key: "loadMore", value: false });
     }
   };
 
   const handleRefreshTransactions = async () => {
     try {
+      handleLoadings({ key: "refresh", value: true });
       await refreshTransactions();
     } catch (error) {
       handleError(
         error,
         "Não foi possível atualizar as transações. Por favor, tente novamente mais tarde.",
       );
+    } finally {
+      handleLoadings({ key: "refresh", value: false });
     }
   };
 
@@ -80,8 +93,8 @@ export function Home() {
         renderItem={({ item }) => <TransactionCard transaction={item} />}
         refreshControl={
           <RefreshControl
-            refreshing={loading}
             onRefresh={handleRefreshTransactions}
+            refreshing={loadings.refresh}
           />
         }
         onEndReached={() => {
