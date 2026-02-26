@@ -7,7 +7,14 @@ import { ListHeader } from "./ListHeader";
 import { TransactionCard } from "./TransactionCard";
 
 export function Home() {
-  const { fetchCategories, fetchTransactions, transactions, refreshTransactions , loading, loadMoreTransactions } = useTransactionContext();
+  const {
+    fetchCategories,
+    fetchTransactions,
+    transactions,
+    refreshTransactions,
+    loading,
+    loadMoreTransactions,
+  } = useTransactionContext();
   const { handleError } = useErrorHandler();
 
   const handleFetchCategories = async () => {
@@ -21,9 +28,45 @@ export function Home() {
     }
   };
 
+  const handleFetchInitialTransactions = async () => {
+    try {
+      await fetchTransactions({ page: 1 });
+    } catch (error) {
+      handleError(
+        error,
+        "Não foi possível carregar as transações. Por favor, tente novamente mais tarde.",
+      );
+    }
+  };
+
+  const handleLoadMoreTransactions = async () => {
+    try {
+      await loadMoreTransactions();
+    } catch (error) {
+      handleError(
+        error,
+        "Não foi possível carregar mais transações. Por favor, tente novamente mais tarde.",
+      );
+    }
+  };
+
+  const handleRefreshTransactions = async () => {
+    try {
+      await refreshTransactions();
+    } catch (error) {
+      handleError(
+        error,
+        "Não foi possível atualizar as transações. Por favor, tente novamente mais tarde.",
+      );
+    }
+  };
+
   useEffect(() => {
     (async () => {
-      await Promise.all([fetchTransactions({ page: 1 }), handleFetchCategories()]);
+      await Promise.all([
+        handleFetchInitialTransactions(),
+        handleFetchCategories(),
+      ]);
     })();
   }, []);
 
@@ -38,11 +81,11 @@ export function Home() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={refreshTransactions}
+            onRefresh={handleRefreshTransactions}
           />
         }
         onEndReached={() => {
-          loadMoreTransactions();
+          handleLoadMoreTransactions();
         }}
         onEndReachedThreshold={0.5}
       />

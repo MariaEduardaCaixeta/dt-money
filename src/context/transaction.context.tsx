@@ -67,25 +67,27 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
       total: 0,
     });
 
-  const refreshTransactions = async () => {
-    const { page, perPage } = pagination;
-    setLoading(true);
+  const refreshTransactions = useCallback(async () => {
+    async () => {
+      const { page, perPage } = pagination;
+      setLoading(true);
 
-    const transactions = await transactionService.getTransactions({
-      page: 1,
-      perPage: page * perPage,
-    });
+      const transactions = await transactionService.getTransactions({
+        page: 1,
+        perPage: page * perPage,
+      });
 
-    setTransactions(transactions.data);
-    setTotalTransactions(transactions.totalTransactions);
-    setPagination({
-      ...pagination,
-      page,
-      totalRows: transactions.totalRows,
-      totalPages: transactions.totalPages,
-    });
-    setLoading(false);
-  };
+      setTransactions(transactions.data);
+      setTotalTransactions(transactions.totalTransactions);
+      setPagination({
+        ...pagination,
+        page,
+        totalRows: transactions.totalRows,
+        totalPages: transactions.totalPages,
+      });
+      setLoading(false);
+    };
+  }, [pagination]);
 
   const fetchCategories = async () => {
     const categories = await transactionService.getTransactionCategories();
