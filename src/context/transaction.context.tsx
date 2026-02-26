@@ -12,6 +12,7 @@ import { ICreateTransactionRequest } from "@/shared/interfaces/create-transactio
 import { ITransaction } from "@/shared/interfaces/transaction";
 import { ITotalTransactions } from "@/shared/interfaces/total-transactions";
 import { IUpdateTransactionRequest } from "@/shared/interfaces/update-transaction-request";
+import { ref } from "yup";
 
 export type TransactionContextType = {
   fetchCategories: () => Promise<void>;
@@ -22,7 +23,11 @@ export type TransactionContextType = {
   fetchTransactions: () => Promise<void>;
   totalTransactions: ITotalTransactions;
   transactions: ITransaction[];
-  updateTransaction: (transactionData: IUpdateTransactionRequest) => Promise<void>;
+  updateTransaction: (
+    transactionData: IUpdateTransactionRequest,
+  ) => Promise<void>;
+  refreshTransactions: () => Promise<void>;
+  loading: boolean;
 };
 
 export const TransactionContext = createContext({} as TransactionContextType);
@@ -34,12 +39,20 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
     ITransactionCategoriesResponse[]
   >([]);
 
+  const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [totalTransactions, setTotalTransactions] = useState<ITotalTransactions>({
-    expense: 0,
-    revenue: 0,
-    total: 0,
-  });
+  const [totalTransactions, setTotalTransactions] =
+    useState<ITotalTransactions>({
+      expense: 0,
+      revenue: 0,
+      total: 0,
+    });
+
+  const refreshTransactions = async () => {
+    setLoading(true);
+    await fetchTransactions();
+    setLoading(false);
+  };
 
   const fetchCategories = async () => {
     const categories = await transactionService.getTransactionCategories();
@@ -50,12 +63,14 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
     transactionData: ICreateTransactionRequest,
   ) => {
     await transactionService.createTransaction(transactionData);
+    await refreshTransactions();
   };
 
   const updateTransaction = async (
     transactionData: IUpdateTransactionRequest,
   ) => {
     await transactionService.updateTransaction(transactionData);
+    await refreshTransactions();
   };
 
   const fetchTransactions = useCallback(async () => {
@@ -71,12 +86,14 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
     <TransactionContext.Provider
       value={{
         fetchCategories,
-        categories,
         createTransaction,
         fetchTransactions,
+        updateTransaction,
+        refreshTransactions,
+        categories,
         totalTransactions,
         transactions,
-        updateTransaction,
+        loading
       }}
     >
       {children}

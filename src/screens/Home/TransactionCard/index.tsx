@@ -8,6 +8,7 @@ import { Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { RightAction } from "./RightAction";
 import { LeftAction } from "./LeftAction";
+import { moneyMapper } from "@/shared/utils/money-mapper";
 
 interface Params {
   transaction: ITransaction;
@@ -34,7 +35,7 @@ export function TransactionCard({ transaction }: Params) {
         <Text className="text-base text-white">{transaction.description}</Text>
         <Text className={clsx("text-2xl font-bold mt-2", isExpense ? "text-accent-red" : "text-accent-brand-light")}>
           {isExpense && "-"} R${" "}
-          {transaction.value.toFixed(2).replace(".", ",")}
+          {moneyMapper(transaction.value)}
         </Text>
         <View className="flex-row w-full justify-between items-center">
           <View className="items-center flex-row mt-3">

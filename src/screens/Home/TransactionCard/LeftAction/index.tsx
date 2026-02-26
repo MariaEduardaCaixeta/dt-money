@@ -15,7 +15,7 @@ export function LeftAction({ transaction }: Params) {
     <Pressable onPress={() => {
         openBottomSheet(<EditTransactionForm transaction={transaction}/>, 1)
     }}>
-        <View className="h-[140] bg-accent-blue w-[80] rounded-l-[6] items-center justify-center">
+        <View className="h-[140] bg-accent-blue-dark w-[80] rounded-l-[6] items-center justify-center">
             <MaterialIcons name="edit" size={30} color={colors.white}/>
         </View>
     </Pressable>
