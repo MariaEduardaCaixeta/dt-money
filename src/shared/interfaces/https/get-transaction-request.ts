@@ -11,11 +11,13 @@ export interface IGetTransactionRequest {
   page: number;
   perPage: number;
   searchText?: string;
-  typeId?: string;
-  categoryIds?: string[];
+}
+
+export interface IFilters {
   from?: Date;
   to?: Date;
-  orderId?: string;
+  typeId?: number;
+  categoryIds: Record<number, boolean>;
 }
 
 export interface IGetTransactionResponse {
