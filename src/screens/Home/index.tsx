@@ -51,13 +51,7 @@ export function Home() {
   const handleLoadMoreTransactions = async () => {
     try {
       handleLoadings({ key: "loadMore", value: true });
-
-      await new Promise((resolve) => {
-        setTimeout(async () => {
-          await loadMoreTransactions();
-          resolve(null);
-        }, 2000);
-      });
+      await loadMoreTransactions();
     } catch (error) {
       handleError(
         error,
