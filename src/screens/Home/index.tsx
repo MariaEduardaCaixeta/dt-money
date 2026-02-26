@@ -1,11 +1,12 @@
 import { useTransactionContext } from "@/context/transaction.context";
 import { useErrorHandler } from "@/shared/hooks/useErrorHandler";
 import { useEffect } from "react";
-import { FlatList, RefreshControl } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ListHeader } from "./ListHeader";
 import { TransactionCard } from "./TransactionCard";
 import { EmptyList } from "./EmptyList";
+import { colors } from "@/shared/colors";
 
 export function Home() {
   const {
@@ -15,7 +16,7 @@ export function Home() {
     refreshTransactions,
     loadMoreTransactions,
     handleLoadings,
-    loadings
+    loadings,
   } = useTransactionContext();
   const { handleError } = useErrorHandler();
 
@@ -50,7 +51,13 @@ export function Home() {
   const handleLoadMoreTransactions = async () => {
     try {
       handleLoadings({ key: "loadMore", value: true });
-      await loadMoreTransactions();
+
+      await new Promise((resolve) => {
+        setTimeout(async () => {
+          await loadMoreTransactions();
+          resolve(null);
+        }, 2000);
+      });
     } catch (error) {
       handleError(
         error,
@@ -102,7 +109,15 @@ export function Home() {
           handleLoadMoreTransactions();
         }}
         onEndReachedThreshold={0.5}
-        ListEmptyComponent={ loadings.initial ? null : <EmptyList /> }
+        ListEmptyComponent={loadings.initial ? null : <EmptyList />}
+        ListFooterComponent={
+          loadings.loadMore ? (
+            <ActivityIndicator
+              color={colors["accent-brand-light"]}
+              size={"large"}
+            />
+          ) : null
+        }
       />
     </SafeAreaView>
   );

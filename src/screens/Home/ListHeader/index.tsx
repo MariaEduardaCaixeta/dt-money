@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native";
 import { TransactionCard } from "./TransactionCard";
 import { TransactionTypes } from "@/shared/enums/transaction-types";
 import { useTransactionContext } from "@/context/transaction.context";
+import { FilterInput } from "./FilterInput";
 
 export function ListHeader() {
   const { totalTransactions } = useTransactionContext();
@@ -24,6 +25,8 @@ export function ListHeader() {
           
         </ScrollView>
       </View>
+
+      <FilterInput />
     </>
   );
 }

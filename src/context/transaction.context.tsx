@@ -53,6 +53,7 @@ export type TransactionContextType = {
   totalTransactions: ITotalTransactions;
   transactions: ITransaction[];
   loadings: Loadings;
+  pagination: IPagination;
 };
 
 export const TransactionContext = createContext({} as TransactionContextType);
@@ -179,6 +180,7 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
         totalTransactions,
         transactions,
         loadings,
+        pagination,
       }}
     >
       {children}
