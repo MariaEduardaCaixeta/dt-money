@@ -21,15 +21,42 @@ export function TransactionCard({ type, amount }: Props) {
   const iconData = ICONS[type];
   const cardData = CARD_DATA[type];
 
-  const { transactions } = useTransactionContext();
+  const { transactions, filters } = useTransactionContext();
 
   const lastTransaction = transactions.find(
     ({ type: transactionType }) => transactionType.id === type,
   );
 
+  const renderDateInfo = () => {
+    if (type === "total") {
+      return <Text className="text-white text-base">
+        {
+          filters.from && filters.to ? (
+            `${format(filters.from, "d MMMM", { locale: ptBR })} até ${format(filters.to, "d MMMM", { locale: ptBR })}`
+          ) : "Todo o período"
+        }
+      </Text>;
+    } else {
+      return (
+        <Text className="text-gray-700">
+          {lastTransaction?.createdAt
+            ? format(
+                lastTransaction?.createdAt,
+                `'Última ${cardData.label.toLocaleLowerCase()} em' d 'de' MMMM'`,
+                { locale: ptBR },
+              )
+            : "Nenhuma transação encontrada"}
+        </Text>
+      );
+    }
+  };
+
   return (
     <View
-      className={clsx(`bg-${cardData.bgColor} min-w-[280] rounded-[6] px-8 py-6 justify-between mr-6`, (type === "total" && Platform.OS === "android") && 'mr-12') }
+      className={clsx(
+        `bg-${cardData.bgColor} min-w-[280] rounded-[6] px-8 py-6 justify-between mr-6`,
+        type === "total" && Platform.OS === "android" && "mr-12",
+      )}
     >
       <View className="flex-row justify-between items-center">
         <Text className="text-white text-base">{cardData.label}</Text>
@@ -40,18 +67,7 @@ export function TransactionCard({ type, amount }: Props) {
         <Text className="text-gray-400 text-2xl font-bold">
           R$ {moneyMapper(amount)}
         </Text>
-
-        {type != "total" && (
-          <Text className="text-gray-700">
-            {lastTransaction?.createdAt
-              ? format(
-                  lastTransaction?.createdAt,
-                  `'Última ${cardData.label.toLocaleLowerCase()} em' d 'de' MMMM'`,
-                  { locale: ptBR },
-                )
-              : "Nenhuma transação encontrada"}
-          </Text>
-        )}
+        {renderDateInfo()}
       </View>
     </View>
   );

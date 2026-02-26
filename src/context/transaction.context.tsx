@@ -56,6 +56,7 @@ export type TransactionContextType = {
   handleLoadings: (params: HandleLoadingsParams) => void;
   setSearchText: (text: string) => void;
   handleFilters: (params: HandleFiltersParams) => void;
+  handleCategoryFilter: (categoryId: number) => void;
   searchText: string;
   categories: ITransactionCategoriesResponse[];
   totalTransactions: ITotalTransactions;
@@ -190,6 +191,17 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
     }));
   };
 
+  const handleCategoryFilter = (categoryId: number) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      categoryIds: {
+        ...prevFilters.categoryIds,
+        [categoryId]: !Boolean(prevFilters.categoryIds[categoryId]),
+      },
+    }));
+
+  };
+
   return (
     <TransactionContext.Provider
       value={{
@@ -202,6 +214,7 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
         handleLoadings,
         setSearchText,
         handleFilters,
+        handleCategoryFilter,
         filters,
         searchText,
         categories,
