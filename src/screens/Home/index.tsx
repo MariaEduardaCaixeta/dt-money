@@ -7,7 +7,7 @@ import { ListHeader } from "./ListHeader";
 import { TransactionCard } from "./TransactionCard";
 
 export function Home() {
-  const { fetchCategories, fetchTransactions, transactions, refreshTransactions , loading} = useTransactionContext();
+  const { fetchCategories, fetchTransactions, transactions, refreshTransactions , loading, loadMoreTransactions } = useTransactionContext();
   const { handleError } = useErrorHandler();
 
   const handleFetchCategories = async () => {
@@ -23,7 +23,7 @@ export function Home() {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([fetchTransactions(), handleFetchCategories()]);
+      await Promise.all([fetchTransactions({ page: 1 }), handleFetchCategories()]);
     })();
   }, []);
 
@@ -41,6 +41,10 @@ export function Home() {
             onRefresh={refreshTransactions}
           />
         }
+        onEndReached={() => {
+          loadMoreTransactions();
+        }}
+        onEndReachedThreshold={0.5}
       />
     </SafeAreaView>
   );

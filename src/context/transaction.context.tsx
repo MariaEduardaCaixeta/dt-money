@@ -13,20 +13,33 @@ import { ITransaction } from "@/shared/interfaces/transaction";
 import { ITotalTransactions } from "@/shared/interfaces/total-transactions";
 import { IUpdateTransactionRequest } from "@/shared/interfaces/update-transaction-request";
 import { ref } from "yup";
+import { IPagination } from "@/shared/interfaces/https/get-transaction-request";
+
+interface FetchTransactionsParams {
+  page?: number;
+  perPage?: number;
+  searchText?: string;
+  typeId?: string;
+  categoryIds?: string[];
+  from?: Date;
+  to?: Date;
+  orderId?: string;
+}
 
 export type TransactionContextType = {
   fetchCategories: () => Promise<void>;
-  categories: ITransactionCategoriesResponse[];
   createTransaction: (
     transactionData: ICreateTransactionRequest,
   ) => Promise<void>;
-  fetchTransactions: () => Promise<void>;
-  totalTransactions: ITotalTransactions;
-  transactions: ITransaction[];
+  fetchTransactions: (params: FetchTransactionsParams) => Promise<void>;
   updateTransaction: (
     transactionData: IUpdateTransactionRequest,
   ) => Promise<void>;
   refreshTransactions: () => Promise<void>;
+  loadMoreTransactions: () => Promise<void>;
+  categories: ITransactionCategoriesResponse[];
+  totalTransactions: ITotalTransactions;
+  transactions: ITransaction[];
   loading: boolean;
 };
 
@@ -40,6 +53,12 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
   >([]);
 
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState<IPagination>({
+    page: 1,
+    perPage: 10,
+    totalRows: 0,
+    totalPages: 0,
+  });
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [totalTransactions, setTotalTransactions] =
     useState<ITotalTransactions>({
@@ -49,8 +68,22 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
     });
 
   const refreshTransactions = async () => {
+    const { page, perPage } = pagination;
     setLoading(true);
-    await fetchTransactions();
+
+    const transactions = await transactionService.getTransactions({
+      page: 1,
+      perPage: page * perPage,
+    });
+
+    setTransactions(transactions.data);
+    setTotalTransactions(transactions.totalTransactions);
+    setPagination({
+      ...pagination,
+      page,
+      totalRows: transactions.totalRows,
+      totalPages: transactions.totalPages,
+    });
     setLoading(false);
   };
 
@@ -73,14 +106,41 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
     await refreshTransactions();
   };
 
-  const fetchTransactions = useCallback(async () => {
-    const transactions = await transactionService.getTransactions({
-      page: 1,
-      perPage: 10,
-    });
-    setTransactions(transactions.data);
-    setTotalTransactions(transactions.totalTransactions);
-  }, []);
+  const fetchTransactions = useCallback(
+    async ({ page = 1 }: FetchTransactionsParams) => {
+      setLoading(true);
+
+      const transactions = await transactionService.getTransactions({
+        page,
+        perPage: pagination.perPage,
+      });
+
+      if (page === 1) {
+        setTransactions(transactions.data);
+      } else {
+        setTransactions((prevTransactions) => [
+          ...prevTransactions,
+          ...transactions.data,
+        ]);
+      }
+
+      setTotalTransactions(transactions.totalTransactions);
+      setPagination({
+        ...pagination,
+        page,
+        totalRows: transactions.totalRows,
+        totalPages: transactions.totalPages,
+      });
+      setLoading(false);
+    },
+    [pagination],
+  );
+
+  const loadMoreTransactions = useCallback(async () => {
+    if (loading || pagination.page >= pagination.totalPages) return;
+
+    fetchTransactions({ page: pagination.page + 1 });
+  }, [loading, pagination]);
 
   return (
     <TransactionContext.Provider
@@ -90,10 +150,11 @@ export const TransactionContextProvider: FC<PropsWithChildren> = ({
         fetchTransactions,
         updateTransaction,
         refreshTransactions,
+        loadMoreTransactions,
         categories,
         totalTransactions,
         transactions,
-        loading
+        loading,
       }}
     >
       {children}
