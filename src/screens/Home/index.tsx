@@ -5,6 +5,7 @@ import { FlatList, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ListHeader } from "./ListHeader";
 import { TransactionCard } from "./TransactionCard";
+import { EmptyList } from "./EmptyList";
 
 export function Home() {
   const {
@@ -101,6 +102,7 @@ export function Home() {
           handleLoadMoreTransactions();
         }}
         onEndReachedThreshold={0.5}
+        ListEmptyComponent={ loadings.initial ? null : <EmptyList /> }
       />
     </SafeAreaView>
   );
