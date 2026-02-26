@@ -64,7 +64,7 @@ export function TransactionCard({ type, amount }: Props) {
       </View>
 
       <View>
-        <Text className="text-gray-400 text-2xl font-bold">
+        <Text className="text-gray-400 text-xl font-bold">
           R$ {moneyMapper(amount)}
         </Text>
         {renderDateInfo()}

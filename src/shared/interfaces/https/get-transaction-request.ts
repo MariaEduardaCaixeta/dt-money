@@ -10,6 +10,10 @@ export interface IPagination {
 export interface IGetTransactionRequest {
   page: number;
   perPage: number;
+  from?: Date;
+  to?: Date;
+  typeId?: number;
+  categoryIds?: number[];
   searchText?: string;
 }
 
